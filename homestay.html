@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Sample WhatsApp lead dashboard for a homestay business, by scalewithluv.">
+<meta name="theme-color" content="#f4f5fb">
+<title>Pinewood Stays Leads</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{color-scheme:light}
+html{background:#f4f5fb}
+/* Layout: one floating sheet of frosted cards over soft colour blooms. Summary first (numbers), then the hot leads
+   that need a reply, with funnel and sources at the side; detail opens in a drawer, never a long scroll. */
+:root{
+  --bg:#f4f5fb; --ink:#141834; --ink-2:#3a3f5c; --muted:#6c7192; --line:rgba(20,24,52,.08);
+  --glass:rgba(255,255,255,.66); --glass-hi:rgba(255,255,255,.9); --glass-edge:rgba(255,255,255,.85);
+  --accent:#2f6bff; --accent-2:#8b5cf6; --accent-soft:color-mix(in srgb,var(--accent) 12%,transparent);
+  --hot:#e5365f; --hot-soft:rgba(229,54,95,.12); --warm:#d9771a; --warm-soft:rgba(217,119,26,.13); --cool:#5b6a8c; --cool-soft:rgba(91,106,140,.12);
+  --ok:#139a5b; --ok-soft:rgba(19,154,91,.12); --wa:#1fae5a;
+  --bloom-1:color-mix(in srgb,var(--accent) 26%,transparent); --bloom-2:color-mix(in srgb,var(--accent-2) 22%,transparent); --bloom-3:rgba(255,190,120,.18);
+  --shadow:0 1px 0 var(--glass-hi) inset,0 30px 60px -34px color-mix(in srgb,var(--accent) 45%,transparent),0 2px 10px rgba(20,24,52,.05);
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --display:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --r:26px;
+}
+
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 84px}
+body::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:radial-gradient(40% 35% at 15% 10%,var(--bloom-1),transparent 70%),radial-gradient(38% 34% at 90% 22%,var(--bloom-2),transparent 70%),
+             radial-gradient(42% 38% at 70% 92%,var(--bloom-3),transparent 70%),radial-gradient(30% 30% at 5% 80%,var(--bloom-2),transparent 70%)}
+@media (prefers-reduced-motion:no-preference){body::after{animation:drift 26s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate(3%,-2%) scale(1.06)}}}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:18px;padding-top:18px}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);border:1px solid var(--glass-edge);border-radius:var(--r);box-shadow:var(--shadow)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* header */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 14px 12px 12px}
+.mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;flex:none;box-shadow:0 10px 24px -10px var(--accent)}
+.mark svg{width:26px;height:26px}
+.who{min-width:0}.who b{display:block;font-size:17px;letter-spacing:-.2px}.who span{color:var(--muted);font-size:12.5px}
+.top .grow{flex:1}
+.fl{display:inline-flex;align-items:center;gap:8px}
+.fl>span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));background:var(--glass-hi);border-radius:12px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--ink-2);white-space:nowrap;
+  transition:background .2s,color .2s,transform .2s,box-shadow .2s}
+.seg button:hover{background:var(--accent-soft);color:var(--accent);transform:translateY(-1px)}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px var(--accent)}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft)}
+/* hero line */
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:6px 6px 0}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,4.6vw,54px);line-height:1;margin:0;letter-spacing:-.5px;text-wrap:balance}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero p{margin:6px 0 0;color:var(--muted);max-width:52ch}
+.reply{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;font-size:13px;color:var(--ink-2)}
+.reply b{font-size:22px;letter-spacing:-.5px;color:var(--ink)}
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{padding:16px 18px 14px;display:flex;flex-direction:column;gap:2px;position:relative;overflow:hidden;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.kpi small{color:var(--muted);font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.kpi b{font-size:30px;letter-spacing:-1px;font-variant-numeric:tabular-nums;font-weight:700}
+.kpi .d{font-size:12px;font-weight:700;color:var(--ok)}
+.kpi svg{position:absolute;right:0;bottom:0;width:46%;height:40px;opacity:.75}
+.kpi .d{position:relative;z-index:1}
+.kpi.hotk b{color:var(--hot)}
+@media (prefers-reduced-motion:no-preference){.kpi{animation:float 7s ease-in-out infinite}.kpi:nth-child(2){animation-delay:-1.7s}.kpi:nth-child(3){animation-delay:-3.4s}.kpi:nth-child(4){animation-delay:-5.1s}
+  @keyframes float{0%,100%{translate:0 0}50%{translate:0 -5px}}}
+.kpi:hover{transform:translateY(-4px)}
+/* main */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.card{padding:18px}
+.ch{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ch h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0;letter-spacing:-.3px}
+.ch .hint{color:var(--muted);font-size:12.5px}
+.ch .grow{flex:1}
+.search{border:1px solid var(--line);background:var(--glass-hi);border-radius:13px;padding:7px 12px;font:inherit;color:var(--ink);width:180px;max-width:100%}
+.leads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lead{position:relative;text-align:left;border:1px solid var(--glass-edge);background:var(--glass-hi);border-radius:20px;padding:14px 14px 12px 16px;display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 14px 30px -22px rgba(20,24,52,.35);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;overflow:hidden}
+.lead::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:var(--c,var(--cool))}
+.lead:hover{transform:translateY(-4px);box-shadow:0 26px 44px -24px color-mix(in srgb,var(--c,var(--accent)) 60%,transparent)}
+.lh{display:flex;align-items:center;gap:10px}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.lh b{display:block;font-size:14.5px}.lh small{color:var(--muted);font-size:12px}
+.heat{margin-left:auto;font-size:11.5px;font-weight:800;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.h-hot{background:var(--hot-soft);color:var(--hot)}.h-warm{background:var(--warm-soft);color:var(--warm)}.h-cool{background:var(--cool-soft);color:var(--cool)}.h-ok{background:var(--ok-soft);color:var(--ok)}
+.why{font-size:13px;color:var(--ink-2)}.why strong{color:var(--c,var(--ink));font-weight:700}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:600;border-radius:9px;padding:3px 8px;background:var(--line);color:var(--ink-2);white-space:nowrap}
+.lf{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.lf .wa{margin-left:auto;font-weight:700;color:var(--wa);display:inline-flex;align-items:center;gap:5px}
+.ins{margin:12px 0 0;padding:9px 12px;border-radius:12px;background:var(--accent-soft);color:var(--ink-2);font-size:12.5px;line-height:1.4}
+.ins b{color:var(--accent)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:-4px 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:8px;height:8px;border-radius:50%}
+.more{margin-top:12px;width:100%;border:1px dashed var(--line);background:transparent;border-radius:14px;padding:9px;font-weight:600;color:var(--muted)}
+/* side */
+.side{display:flex;flex-direction:column;gap:18px}
+.fun{display:flex;flex-direction:column;gap:11px}
+.fr{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:13px}
+.fr span{color:var(--ink-2)}.fr b{font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:9px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.src{display:flex;flex-direction:column;gap:9px}
+.sr{display:flex;align-items:center;gap:10px;font-size:13px}
+.sr .dot{width:10px;height:10px;border-radius:4px;flex:none}
+.sr span{flex:1;color:var(--ink-2)}.sr b{font-variant-numeric:tabular-nums}
+.stack{display:flex;height:12px;border-radius:12px;overflow:hidden;margin-bottom:12px;gap:2px}
+/* lower row */
+.low{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.up{display:flex;flex-direction:column;gap:8px}
+.ur{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:14px;background:var(--glass-hi);border:1px solid var(--glass-edge)}
+.ur time{font-weight:800;font-variant-numeric:tabular-nums;font-size:13px}.ur b{display:block;font-size:13px}.ur small{color:var(--muted);font-size:12px}
+.bc{position:relative;padding:18px 0 0 26px}
+.gy{position:absolute;left:26px;right:0;top:18px;height:150px;pointer-events:none}
+.gy span{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+.gy em{position:absolute;left:-26px;top:-7px;font-style:normal;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars{position:relative;height:150px;display:flex;align-items:flex-end;gap:clamp(2px,1%,8px)}
+.bars .b{position:relative;flex:1;min-width:0;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 55%,transparent),color-mix(in srgb,var(--accent) 22%,transparent));transition:filter .2s,transform .2s;transform-origin:bottom}
+.bars .b.now{background:linear-gradient(180deg,var(--accent-2),var(--accent));box-shadow:0 8px 18px -8px var(--accent)}
+.bars .b b{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:3px;font-size:10.5px;font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bars .b.now b,.bars .b.pk b{color:var(--accent);font-weight:800;font-size:11.5px}
+.tsum{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 10px}.tsum span{font-size:12px;color:var(--muted);background:var(--line);border-radius:10px;padding:4px 10px}.tsum b{color:var(--ink);font-variant-numeric:tabular-nums}
+@media (max-width:720px){.bars.many .b:not(.now):not(.pk) b{display:none}}
+.bars .b:hover{filter:brightness(1.12);transform:scaleY(1.03)}
+.bars .b:hover::after{content:attr(data-t);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--bg);font-size:11.5px;font-weight:700;padding:4px 8px;border-radius:8px;z-index:3}
+.gx{display:flex;gap:clamp(2px,1%,8px);margin-top:6px}
+.gx span{flex:1;min-width:0;font-size:10.5px;color:var(--muted);text-align:center;white-space:nowrap;overflow:visible}
+.items{display:flex;flex-direction:column;gap:10px}
+.it{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:13px}
+.it .bar{height:8px}.it .bar i.b{background:var(--ok)}
+.it em{font-style:normal;color:var(--muted);font-size:12px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,12,30,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);z-index:60}
+.drawer{position:fixed;top:max(12px,env(safe-area-inset-top,0px));bottom:12px;right:max(12px,env(safe-area-inset-right,0px));width:min(420px,calc(100vw - 24px));z-index:61;padding:20px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:din .45s cubic-bezier(.2,.8,.2,1)}@keyframes din{from{transform:translateX(24px)}}}
+.dx{position:absolute;top:14px;right:14px;border:0;background:var(--line);width:34px;height:34px;border-radius:50%;font-size:18px}
+.sum{font-size:12px;font-weight:700;color:var(--wa);display:flex;align-items:center;gap:6px}
+.tl{display:flex;flex-direction:column;gap:0;margin:4px 0 0;padding:0;list-style:none}
+.tl li{position:relative;padding:0 0 14px 22px;font-size:13.5px}
+.tl li::before{content:"";position:absolute;left:4px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--muted);opacity:.5}
+.tl li::after{content:"";position:absolute;left:8px;top:16px;bottom:0;width:1px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.h::before{background:var(--hot);opacity:1;box-shadow:0 0 0 5px var(--hot-soft)}
+.tl small{display:block;color:var(--muted);font-size:12px}
+.cta{border:0;border-radius:16px;padding:12px 16px;font-weight:800;color:#fff;background:var(--wa);box-shadow:0 14px 30px -14px var(--wa)}
+.note{font-size:12px;color:var(--muted)}
+/* toast + footer */
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  background:color-mix(in srgb,#0f1230 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#fff;font-size:13px}
+.foot .sl{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#FFC700;color:#111;font-weight:800;font-size:11px}
+.foot .nm{background:#FFC700;color:#111;border-radius:7px;padding:1px 8px;font-weight:800}
+.foot .wan{background:#25D366;border-radius:16px;padding:4px 12px;font-weight:800;user-select:all}
+.foot small{opacity:.7}
+/* responsive */
+@media (max-width:1060px){.main{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.low{grid-template-columns:1fr 1fr}.low .trend{grid-column:1/-1;order:3}}
+@media (max-width:720px){.kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:14px}.kpi b{font-size:24px}.leads{grid-template-columns:1fr}
+  .side,.low{grid-template-columns:1fr}.hero h1{font-size:36px}.search{width:100%}.ch h2{font-size:24px}.foot small{display:none}.foot{font-size:12px}
+  .top .fl{order:3;width:100%}.top .seg{flex:1;flex-wrap:nowrap}.top .seg button{flex:1;padding:7px 8px}
+  .foot>span:nth-child(2){display:none}.foot{flex-wrap:nowrap}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top glass">
+    <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></div>
+    <div class="who"><b id="bname"></b><span id="bsub"></span></div>
+    <span class="grow"></span>
+    <span class="live"><i></i>Sample data</span>
+    <div class="fl"><span>Period</span><div class="seg" role="group" aria-label="Period" id="range"><button type="button" data-r="7">7 days</button><button type="button" data-r="30" aria-pressed="true">30 days</button><button type="button" data-r="90">90 days</button></div></div>
+  </header>
+
+  <section class="hero">
+    <div><h1 id="h1"></h1><p id="lede"></p></div>
+    <div class="reply glass"><span>Average reply</span><b id="replyt"></b><span id="replyn"></span></div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+  <section class="main">
+    <div class="card glass">
+      <div class="ch"><h2>Hot leads</h2><span class="hint" id="lhint"></span><span class="grow"></span>
+        <div class="fl"><span>Show</span><div class="seg" role="group" aria-label="Show" id="heatSeg"><button type="button" data-h="hot" aria-pressed="true">Hot</button><button type="button" data-h="warm">Warm</button><button type="button" data-h="all">All</button></div></div>
+        <input class="search" id="q" type="search" placeholder="Search name or stay" aria-label="Search leads"></div>
+      <div class="legend"><span><i style="background:var(--hot)"></i>Hot: stopped at payment, holding, or asked for you</span><span><i style="background:var(--warm)"></i>Warm: got a price</span><span><i style="background:var(--cool)"></i>Cool: just browsing</span></div>
+      <div class="leads" id="leads"></div>
+      <button class="more" id="more" type="button" hidden></button>
+    </div>
+    <aside class="side">
+      <div class="card glass"><div class="ch"><h2>Funnel</h2><span class="hint">from WhatsApp chats</span></div><div class="fun" id="fun"></div><p class="ins" id="insFun"></p></div>
+      <div class="card glass"><div class="ch"><h2>Where leads come from</h2></div><div class="stack" id="stack"></div><div class="src" id="src"></div><p class="ins" id="insSrc"></p></div>
+    </aside>
+  </section>
+
+  <section class="low">
+    <div class="card glass"><div class="ch"><h2 id="uph"></h2><span class="hint" id="upd"></span></div><div class="up" id="up"></div><p class="ins" id="insUp"></p></div>
+    <div class="card glass trend"><div class="ch"><h2>Enquiries</h2><span class="hint" id="trh"></span></div><div id="trend"></div><p class="ins" id="insTr"></p></div>
+    <div class="card glass"><div class="ch"><h2 id="ith"></h2><span class="hint">asked vs booked</span></div><div class="items" id="items"></div><p class="ins" id="insIt"></p></div>
+  </section>
+</div>
+
+<div class="foot" role="contentinfo"><span class="sl">SL</span><span>Built by <span class="nm">scalewithluv</span></span><a class="wan" href="https://wa.me/918922862861" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">WhatsApp +91 89228 62861</a><small>Sample dashboard with dummy data. Not connected to any business.</small></div>
+<div id="layer"></div>
+
+<script>
+const DATA={"brand": {"name": "Pinewood Stays", "sub": "WhatsApp lead dashboard · 4 homestays", "h1": "Every guest chat, <em>turned into bookings.</em>", "lede": "Your AI concierge answers guests on WhatsApp, quotes, holds dates and flags anyone who's close to booking."}, "labels": {"enq": "Guest enquiries", "booked": "Bookings from WhatsApp", "rev": "Revenue from WhatsApp", "upTitle": "Arriving today", "upHint": "check-in from 2 PM", "upNote": "Pay-on-arrival guests are flagged so you collect at check-in.", "itTitle": "Most asked stays"}, "kpi": {"enq": 146, "enqUp": 18, "booked": 31, "rev": 294000, "revUp": 22, "reply": "3 sec"}, "funnel": [["Asked about a stay", 146], ["Got a price", 112], ["Held dates", 54], ["Booked", 31]], "sources": [["Instagram", 58], ["Google Maps", 41], ["Past guests", 27], ["Website", 20]], "items": [["Pine Cottage", 48, 12], ["Cedar Loft", 39, 9], ["Maple Villa", 33, 6], ["River Nook", 26, 4]], "upcoming": [{"t": "2:00 PM", "who": "Aarav Mehta", "what": "Cedar Loft · 2 nights · 2 guests", "st": "Paid", "ok": true}, {"t": "3:30 PM", "who": "Ishita Rao", "what": "Pine Cottage · 3 nights · 4 guests", "st": "Paid", "ok": true}, {"t": "6:00 PM", "who": "Kabir Das", "what": "Maple Villa · 1 night · 2 guests", "st": "Pay on arrival", "ok": false}], "leads": [{"name": "Riya Sharma", "phone": "+91 90000 10000", "heat": "hot", "why": "Stopped at payment", "why2": "check-in in 2 days", "item": "Pine Cottage", "when": "Fri–Sun", "value": 7840, "src": "Instagram", "ago": "25 min ago", "tl": [["Asked for a stay for 2 this weekend", "11:04 PM"], ["Got a price · Pine Cottage ₹7,840", "11:05 PM"], ["Held the dates · payment link sent", "11:05 PM"], ["Hold expired · didn't pay", "11:35 PM"]], "av": ["#7c5cff", "#3d7bff"]}, {"name": "Kabir Singh", "phone": "+91 90000 10137", "heat": "hot", "why": "Asked to talk to the host", "why2": "4 guests", "item": "Maple Villa", "when": "14–16 Nov", "value": 13600, "src": "Google Maps", "ago": "1 h ago", "tl": [["Asked about Maple Villa for 4", "Yesterday 7:40 PM"], ["Got a price · ₹13,600", "7:41 PM"], ["Tapped “Talk to the host”", "7:44 PM"]], "av": ["#ff7a59", "#e8336d"]}, {"name": "Ananya Bose", "phone": "+91 90000 10274", "heat": "hot", "why": "Holding dates, not paid yet", "why2": "came back 3×", "item": "Cedar Loft", "when": "21–23 Nov", "value": 9200, "src": "Past guests", "ago": "40 min ago", "tl": [["Asked about Cedar Loft", "Mon 6:10 PM"], ["Came back twice more", "Tue, Wed"], ["Held 21–23 Nov · link sent", "Today 9:12 AM"]], "av": ["#14b8a6", "#0e7490"]}, {"name": "Neha Arora", "phone": "+91 90000 10311", "heat": "hot", "why": "Special request waiting for you", "why2": "pets", "item": "River Nook", "when": "28–30 Nov", "value": 6900, "src": "Website", "ago": "3 h ago", "tl": [["Asked if dogs are allowed", "9:20 AM"], ["Request sent to you", "9:21 AM"]], "av": ["#f59e0b", "#ea580c"]}, {"name": "Vivaan Rao", "phone": "+91 90000 10448", "heat": "warm", "why": "Got a price", "why2": "checking dates", "item": "Pine Cottage", "when": "Dec, flexible", "value": 7840, "src": "Instagram", "ago": "1 d ago", "tl": [["Asked about December", "Yesterday"], ["Got a price · ₹7,840", "Yesterday"]], "av": ["#a855f7", "#ec4899"]}, {"name": "Sara Thomas", "phone": "+91 90000 10585", "heat": "warm", "why": "Asked twice", "why2": "group of 6", "item": "Maple Villa", "when": "New Year", "value": 21000, "src": "Instagram", "ago": "2 d ago", "tl": [["Asked about New Year for 6", "Tue"], ["Asked again", "Thu"]], "av": ["#22c55e", "#0d9488"]}, {"name": "Dev Malhotra", "phone": "+91 90000 10622", "heat": "cool", "why": "Viewed stays", "why2": "", "item": "Cedar Loft", "when": "—", "value": 0, "src": "Google Maps", "ago": "4 d ago", "tl": [["Opened the stay list", "Sun"]], "av": ["#3b82f6", "#6366f1"]}, {"name": "Tara Joshi", "phone": "+91 90000 10759", "heat": "won", "why": "Booked after a reminder", "why2": "", "item": "Pine Cottage", "when": "7–9 Nov", "value": 7840, "src": "Past guests", "ago": "2 d ago", "tl": [["Asked for 7–9 Nov", "Mon"], ["Held dates", "Mon"], ["Paid · booking confirmed", "Mon"]], "av": ["#64748b", "#334155"]}]};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const inr=n=>n>=100000?'₹'+(n/100000).toFixed(2).replace(/\.?0+$/,'')+'L':'₹'+Math.round(n).toLocaleString('en-IN');
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+let RANGE=30,HEAT='hot',Q='',SHOW=6;
+const SC={7:.26,30:1,90:2.85};
+function rnd(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
+function series(n,base,seed){const r=rnd(seed),a=[];for(let i=0;i<n;i++)a.push(Math.max(0,Math.round(base*(.6+.8*r())*(1+.35*Math.sin(i/3.2))+(i/n)*base*.4)));return a}
+function spark(a,col){const w=120,h=40,m=Math.max(...a,1);const p=a.map((v,i)=>[i/(a.length-1)*w,h-4-(v/m)*(h-10)]);
+  const d='M'+p.map(q=>q.map(x=>x.toFixed(1)).join(' ')).join(' L');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g${col}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><path d="${d} L${w} ${h} L0 ${h}Z" fill="url(#g${col})"/><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/><circle cx="${p[p.length-1][0]}" cy="${p[p.length-1][1]}" r="3" fill="var(--accent)"/></svg>`}
+function countUp(el,to,fmt){if(calm()){el.textContent=fmt(to);return}const t0=performance.now();const st=n=>{const k=Math.min(1,(n-t0)/700),e=1-Math.pow(1-k,3);el.textContent=fmt(to*e);if(k<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
+
+function kpis(){const s=SC[RANGE],K=DATA.kpi;
+  const enq=Math.round(K.enq*s),hot=DATA.leads.filter(l=>l.heat==='hot').length,bk=Math.round(K.booked*s),rev=K.rev*s;
+  const tiles=[[DATA.labels.enq,enq,'+'+K.enqUp+'% vs last '+RANGE+'d',n=>Math.round(n).toLocaleString('en-IN'),1],
+    ['🔥 Hot leads',hot,'waiting for your reply',n=>Math.round(n),2],[DATA.labels.booked,bk,Math.round(bk/Math.max(enq,1)*100)+'% converted',n=>Math.round(n),3],
+    [DATA.labels.rev,rev,'+'+K.revUp+'% vs last '+RANGE+'d',inr,4]];
+  $('#kpis').innerHTML=tiles.map(([l,v,d,f,i])=>`<div class="kpi glass${i===2?' hotk':''}"><small>${l}</small><b data-i="${i}">0</b><span class="d">${d}</span>${spark(series(14,8+i*3,i*97+RANGE),i)}</div>`).join('');
+  tiles.forEach(([l,v,d,f,i])=>countUp($(`#kpis b[data-i="${i}"]`),v,f));}
+const HC={hot:'var(--hot)',warm:'var(--warm)',cool:'var(--cool)',won:'var(--ok)'};
+const HL={hot:'🔥 Hot',warm:'Warm',cool:'Cool',won:'Booked ✓'};
+function leads(){const list=DATA.leads.filter(l=>(HEAT==='all'||l.heat===HEAT)&&(!Q||(l.name+' '+l.item).toLowerCase().includes(Q)));
+  $('#lhint').textContent=`${DATA.leads.filter(l=>l.heat==='hot').length} need a reply · hottest first`;
+  const shown=list.slice(0,SHOW);
+  $('#leads').innerHTML=shown.length?shown.map((l,i)=>`<button class="lead" type="button" data-i="${DATA.leads.indexOf(l)}" style="--c:${HC[l.heat]}">
+    <div class="lh"><span class="av" style="background:linear-gradient(135deg,${l.av[0]},${l.av[1]})">${esc(l.name.split(' ').map(x=>x[0]).join(''))}</span><div><b>${esc(l.name)}</b><small>${esc(l.phone)}</small></div><span class="heat h-${l.heat==='won'?'ok':l.heat}">${HL[l.heat]}</span></div>
+    <div class="why"><strong>${esc(l.why)}</strong>${l.why2?' · '+esc(l.why2):''}</div>
+    <div class="tags"><span class="tag">${esc(l.item)}</span><span class="tag">${esc(l.when)}</span><span class="tag">${inr(l.value)}</span></div>
+    <div class="lf"><span>${esc(l.src)} · ${esc(l.ago)}</span><span class="wa">Open chat ›</span></div></button>`).join(''):`<p class="note">No leads match. Try “All” or clear the search.</p>`;
+  const rest=list.length-shown.length;$('#more').hidden=rest<=0;$('#more').textContent=`Show ${rest} more`;}
+function side(){const s=SC[RANGE],F=DATA.funnel,top=Math.round(F[0][1]*s);
+  $('#fun').innerHTML=F.map(([l,v])=>{const n=Math.round(v*s);return `<div class="fr"><span>${l}</span><b>${n} <small style="color:var(--muted);font-weight:600">${Math.round(n/top*100)}%</small></b><div class="bar"><i style="width:${(n/top*100).toFixed(1)}%"></i></div></div>`}).join('');
+  const S=DATA.sources,tot=S.reduce((a,b)=>a+b[1],0),cols=['var(--accent)','var(--accent-2)','#f2a24b','#2bb3a3'];
+  $('#stack').innerHTML=S.map((x,i)=>`<i style="flex:${x[1]};background:${cols[i]}"></i>`).join('');
+  {let worst=1,wi=1;for(let i=1;i<F.length;i++){const r=F[i][1]/F[i-1][1];if(r<worst){worst=r;wi=i}}
+   $('#insFun').innerHTML=`Biggest drop: <b>${F[wi-1][0]} → ${F[wi][0]}</b> (${Math.round((1-worst)*100)}% stop here). The hot leads list shows exactly who to nudge.`;}
+  {const t=S.reduce((a,b)=>a+b[1],0);$('#insSrc').innerHTML=`<b>${S[0][0]}</b> bring ${Math.round(S[0][1]/t*100)}% of leads. Put more budget where the chats come from.`;}
+  $('#src').innerHTML=S.map((x,i)=>`<div class="sr"><i class="dot" style="background:${cols[i]}"></i><span>${x[0]}</span><b>${Math.round(x[1]*s)}</b><em style="font-style:normal;color:var(--muted);font-size:12px;width:38px;text-align:right">${Math.round(x[1]/tot*100)}%</em></div>`).join('');}
+function low(){const U=DATA.upcoming;$('#uph').textContent=DATA.labels.upTitle;$('#upd').textContent=DATA.labels.upHint;
+  $('#up').innerHTML=U.map(u=>`<div class="ur"><time>${u.t}</time><div><b>${esc(u.who)}</b><small>${esc(u.what)}</small></div><span class="heat ${u.ok?'h-ok':'h-warm'}">${esc(u.st)}</span></div>`).join('');
+  // enquiries: rounded bars, one per day (per week for 90 days), weekend lift + gentle upward trend
+  const wk=RANGE===90,n=RANGE===7?7:RANGE===30?30:13,total=Math.round(DATA.kpi.enq*SC[RANGE]),today=new Date();
+  const raw=[...Array(n)].map((_,i)=>{const dt=new Date(today);dt.setDate(today.getDate()-(n-1-i)*(wk?7:1));
+    const wkend=[0,5,6].includes(dt.getDay())&&!wk?1.35:1;return {dt,v:(.8+.4*(i/n))*wkend*(1+.12*Math.sin(i*1.7))}});
+  const sum=raw.reduce((a,b)=>a+b.v,0);let acc=0;raw.forEach(r=>{r.n=Math.max(0,Math.round(r.v/sum*total));acc+=r.n});raw[n-1].n+=total-acc;
+  const m=Math.max(...raw.map(r=>r.n),1),st=m>40?20:m>20?10:m>8?4:2,top=Math.ceil(m/st)*st;
+  const pk=raw.reduce((b,r,i)=>r.n>raw[b].n?i:b,0);
+  const fmt=dt=>RANGE===7?dt.toLocaleDateString('en-IN',{weekday:'short'}):dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  const every=RANGE===7?1:RANGE===30?6:3;
+  $('#trh').textContent=wk?'per week':'per day';
+  const long=dt=>dt.toLocaleDateString('en-IN',wk?{day:'numeric',month:'short'}:{weekday:'short',day:'numeric',month:'short'});
+  const tsum=`<div class="tsum"><span>Total <b>${total}</b></span><span>${wk?'Weekly':'Daily'} average <b>${Math.round(total/n)}</b></span><span>Peak <b>${raw[pk].n}</b> on ${long(raw[pk].dt)}</span><span>${wk?'This week':'Today'} <b>${raw[n-1].n}</b></span></div>`;
+  $('#trend').innerHTML=tsum+`<div class="bc" role="img" aria-label="Enquiries ${wk?'per week':'per day'}, highest ${m}">
+    <div class="gy">${[1,.5,0].map(f=>`<span style="bottom:${f*100}%"><em>${Math.round(f*top)}</em></span>`).join('')}</div>
+    <div class="bars${n>14?' many':''}">${raw.map((r,i)=>`<div class="b${i===n-1?' now':''}${i===pk?' pk':''}" style="height:${(r.n/top*100).toFixed(1)}%" data-t="${fmt(r.dt)}: ${r.n} enquiries"><b>${r.n}</b></div>`).join('')}</div>
+    <div class="gx">${raw.map((r,i)=>`<span>${(n-1-i)%every===0?fmt(r.dt):''}</span>`).join('')}</div></div>`;
+  {const by={};raw.forEach(r=>{if(!wk){const d=r.dt.toLocaleDateString('en-IN',{weekday:'short'});by[d]=(by[d]||0)+r.n}});const best=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]);
+   $('#insTr').innerHTML=wk?`Enquiries are <b>trending up</b> week on week. The latest week is highlighted.`:`Busiest days: <b>${best.join(' and ')}</b>. Be available then, or let the bot handle it. Today is highlighted.`;}
+  {const paid=U.filter(u=>u.ok).length;$('#insUp').innerHTML=`<b>${paid} of ${U.length}</b> confirmed. ${U.length-paid?DATA.labels.upNote:'All set for today.'}`;}
+  $('#ith').textContent=DATA.labels.itTitle;const s=SC[RANGE],mx=Math.max(...DATA.items.map(x=>x[1]));
+  {const bestI=[...DATA.items].sort((a,b)=>b[2]/b[1]-a[2]/a[1])[0];$('#insIt').innerHTML=`<b>${esc(bestI[0])}</b> converts best (${Math.round(bestI[2]/bestI[1]*100)}% of askers book). Feature it in ads and replies.`;}
+  $('#items').innerHTML=DATA.items.map(([nm,a,b])=>`<div class="it"><span>${esc(nm)}</span><em>${Math.round(a*s)} asked · ${Math.round(b*s)} booked · <b style="color:var(--ok)">${Math.round(b/a*100)}%</b></em><div class="bar"><i style="width:${(a/mx*100).toFixed(1)}%"></i></div></div>`).join('');}
+function drawer(i){const l=DATA.leads[i];
+  $('#layer').innerHTML=`<div class="scrim" id="scrim"></div><aside class="drawer glass" role="dialog" aria-modal="true" aria-label="${esc(l.name)}"><button class="dx" id="dx" type="button" aria-label="Close">×</button>
+    <div class="lh"><span class="av" style="width:46px;height:46px;font-size:15px;background:linear-gradient(135deg,${l.av[0]},${l.av[1]})">${esc(l.name.split(' ').map(x=>x[0]).join(''))}</span><div><b style="font-size:18px">${esc(l.name)}</b><small>${esc(l.phone)} · ${esc(l.src)}</small></div></div>
+    <span class="heat h-${l.heat==='won'?'ok':l.heat}" style="align-self:flex-start;margin:0">${HL[l.heat]} · ${esc(l.why)}</span>
+    <div class="tags"><span class="tag">${esc(l.item)}</span><span class="tag">${esc(l.when)}</span><span class="tag">${inr(l.value)}</span></div>
+    <div class="sum">● WhatsApp chat · summarised</div>
+    <ol class="tl">${l.tl.map((x,j)=>`<li class="${j===l.tl.length-1&&l.heat==='hot'?'h':''}">${esc(x[0])}<small>${esc(x[1])}</small></li>`).join('')}</ol>
+    <button class="cta" id="replyBtn" type="button">Reply on WhatsApp</button>
+    <p class="note">In the live dashboard this opens the chat with ${esc(l.name.split(' ')[0])} on your phone.</p></aside>`;
+  $('#scrim').onclick=$('#dx').onclick=closeD;$('#replyBtn').onclick=()=>toast('Demo: in the live product this opens WhatsApp');$('#dx').focus();}
+function closeD(){$('#layer').innerHTML=''}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeD()});
+function toast(t){const d=document.createElement('div');d.className='toast glass';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2200)}
+function render(){kpis();leads();side();low()}
+$('#range').onclick=e=>{const b=e.target.closest('button');if(!b)return;RANGE=+b.dataset.r;$('#range').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+$('#heatSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;HEAT=b.dataset.h;SHOW=6;$('#heatSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));leads()};
+$('#q').oninput=e=>{Q=e.target.value.trim().toLowerCase();leads()};
+$('#more').onclick=()=>{SHOW=99;leads()};
+$('#leads').onclick=e=>{const b=e.target.closest('.lead');if(b)drawer(+b.dataset.i)};
+$('#bname').textContent=DATA.brand.name;$('#bsub').textContent=DATA.brand.sub;$('#h1').innerHTML=DATA.brand.h1;$('#lede').textContent=DATA.brand.lede;
+$('#replyt').textContent=DATA.kpi.reply;$('#replyn').textContent='day or night';
+render();
+</script>
+
+</body>
+</html>
